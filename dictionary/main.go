@@ -1,117 +1,31 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
-	"log"
+	"io/ioutil"
 	"net/http"
 	"os"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/ssm"
+	"path/filepath"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go/aws/session"
 )
 
-var awsSess *session.Session
-var errorLogger = log.New(os.Stderr, "ERROR ", log.Llongfile)
+type Dictionary struct {
+	Modified int64    `json:"modified,omitempty"`
+	Terms    []string `json:"terms"`
+}
 
 const (
-	DictionaryStore = "config-restricted-dictionary"
+	DictionaryBucket        = "fuzzy-service-bucket"
+	DictionaryFile          = "dictionary.json"
+	DictionaryFileDirectory = "/tmp"
+	DictionaryLifespan      = 1800
 )
 
-type ResponseBody struct {
-	Dictionary string `json:"dictionary"`
-}
-
-type RequestBody struct {
-	Terms []string `json:"terms"`
-}
-
-func Post(sess *session.Session, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	if req.Headers["Content-Type"] != "application/json" {
-		return clientError(http.StatusNotAcceptable)
-	}
-
-	body := new(RequestBody)
-
-	err := json.Unmarshal([]byte(req.Body), body)
-
-	if err != nil {
-		return clientError(http.StatusUnprocessableEntity)
-	}
-
-	err = addTerms(sess, *body)
-
-	if err != nil {
-		return serverError(err)
-	}
-
-	return events.APIGatewayProxyResponse{
-		StatusCode: http.StatusCreated,
-		Headers:    map[string]string{"Location": "/dictionary"},
-	}, nil
-}
-
-func addTerms(sess *session.Session, terms RequestBody) error {
-	svc := ssm.New(sess)
-
-	dictionary, err := getDictionary(sess)
-
-	if err != nil {
-		return err
-	}
-
-	buf := bytes.Buffer{}
-	buf.WriteString(dictionary)
-	buf.WriteString(term)
-	appended := buf.String()
-
-	_, err = svc.PutParameter(
-		&ssm.PutParameterInput{
-			Name:      aws.String(DictionaryStore),
-			Value:     aws.String(appended),
-			Type:      aws.String("StringList"),
-			Overwrite: aws.Bool(true),
-		},
-	)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func getDictionary(sess *session.Session) (string, error) {
-	svc := ssm.New(sess)
-
-	output, err := svc.GetParameter(
-		&ssm.GetParameterInput{
-			Name:           aws.String(DictionaryStore),
-			WithDecryption: aws.Bool(false),
-		},
-	)
-
-	return *output.Parameter.Value, err
-}
-
-func Get(sess *session.Session, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	dictionary, err := getDictionary(sess)
-
-	if err != nil {
-		return serverError(err)
-	}
-
-	resp, _ := json.Marshal(ResponseBody{Dictionary: dictionary})
-
-	return events.APIGatewayProxyResponse{
-		StatusCode: http.StatusOK,
-		Body:       string(resp),
-	}, nil
-}
+var path = filepath.Join(DictionaryFileDirectory, DictionaryFile)
 
 func clientError(status int) (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{
@@ -121,29 +35,138 @@ func clientError(status int) (events.APIGatewayProxyResponse, error) {
 }
 
 func serverError(err error) (events.APIGatewayProxyResponse, error) {
-	errorLogger.Println(err.Error())
-
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusInternalServerError,
 		Body:       http.StatusText(http.StatusInternalServerError),
 	}, nil
 }
 
-func handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	if awsSess == nil {
-		awsSess = session.Must(session.NewSession())
+func getDictionary(session *session.Session, dictionary *Dictionary, forceUpdate bool) error {
+	info, err := os.Stat(path)
+
+	if os.IsNotExist(err) {
+		// download from s3 if file doesn't exist
+		err = DownloadFromS3(session, DictionaryFileDirectory, DictionaryFile, DictionaryBucket)
+	} else if err != nil {
+		// return server error if unrecognized error
+		return err
+	} else {
+		// check age of file
+		now := time.Now()
+		age := now.Sub(info.ModTime()).Seconds()
+
+		// a busy Lamdba function could go a while before exiting so we want to be sure it
+		// periodically pulls new versions of our dictionary
+		if age > DictionaryLifespan || forceUpdate {
+			err = DownloadFromS3(session, DictionaryFileDirectory, DictionaryFile, DictionaryBucket)
+		}
 	}
 
+	if err != nil {
+		return err
+	}
+
+	jsonFile, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+
+	// defer the closing of our jsonFile so that we can parse it later on
+	defer jsonFile.Close()
+
+	// read our opened jsonFile as a byte array.
+	byteValue, err := ioutil.ReadAll(jsonFile)
+
+	// we unmarshal our byteArray which contains our
+	// jsonFile's content into dictionary
+	err = json.Unmarshal(byteValue, &dictionary)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Get(session *session.Session) (events.APIGatewayProxyResponse, error) {
+	var dictionary Dictionary
+
+	err := getDictionary(session, &dictionary, false)
+	if err != nil {
+		return serverError(err)
+	}
+
+	resp, err := json.Marshal(dictionary)
+	if err != nil {
+		return serverError(err)
+	}
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: http.StatusOK,
+		Body:       string(resp),
+	}, nil
+}
+
+func PostPut(session *session.Session, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	if req.Headers["Content-Type"] != "application/json" {
+		return clientError(http.StatusNotAcceptable)
+	}
+
+	var requestDictionary Dictionary
+	err := json.Unmarshal([]byte(req.Body), &requestDictionary)
+	if err != nil {
+		return clientError(http.StatusUnprocessableEntity)
+	}
+
+	if len(requestDictionary.Terms) == 0 {
+		return clientError(http.StatusBadRequest)
+	}
+
+	if req.HTTPMethod == http.MethodPost {
+		var dictionary Dictionary
+		err = getDictionary(session, &dictionary, true)
+		if err != nil {
+			return serverError(err)
+		}
+
+		requestDictionary.Terms = append(requestDictionary.Terms, dictionary.Terms...)
+	}
+
+	requestDictionary.Modified = time.Now().Unix()
+
+	resp, err := json.Marshal(requestDictionary)
+	if err != nil {
+		return serverError(err)
+	}
+
+	err = ioutil.WriteFile(path, []byte(resp), 0666)
+	if err != nil {
+		return serverError(err)
+	}
+
+	err = UploadToS3(session, DictionaryFileDirectory, DictionaryFile, DictionaryBucket)
+	if err != nil {
+		return serverError(err)
+	}
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: http.StatusOK,
+		Body:       string(resp),
+	}, nil
+}
+
+func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	sess := session.Must(session.NewSession())
+
 	switch req.HTTPMethod {
-	case "GET":
-		return Get(awsSess, req)
-	case "POST":
-		return Post(awsSess, req)
+	case http.MethodGet:
+		return Get(sess)
+	case http.MethodPost, http.MethodPut:
+		return PostPut(sess, req)
 	default:
 		return clientError(http.StatusMethodNotAllowed)
 	}
 }
 
 func main() {
-	lambda.Start(handler)
+	lambda.Start(Handler)
 }
