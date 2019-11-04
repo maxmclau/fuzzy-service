@@ -33,10 +33,12 @@ Detailed request and response information for API
 
 ##### GET /match
 Return all matched terms against dictionary
-
 ```http
 GET /prod/match?q=Ammo&amp; q=I sell ammunition HTTP/1.1
 ```
+
+<details>
+<summary><strong>Response</strong></summary>
 
 ```js
 [
@@ -49,6 +51,9 @@ GET /prod/match?q=Ammo&amp; q=I sell ammunition HTTP/1.1
     }
 ]
 ``` 
+</details>
+
+
 
 ##### GET /terms
 Return all terms used in fuzzy matching along with the date they were last modified
@@ -56,6 +61,9 @@ Return all terms used in fuzzy matching along with the date they were last modif
 ```http
 GET /prod/terms HTTP/1.1
 ```
+
+<details>
+<summary><strong>Response</strong></summary>
 
 ```js
 {
@@ -68,7 +76,8 @@ GET /prod/terms HTTP/1.1
         ...
     ]
 }
-``` 
+```
+</details>
 
 ##### POST /terms
 Add additional terms to terms dictionary and return updated dictionary
@@ -86,6 +95,9 @@ Content-Length: 189
 }
 ```
 
+<details>
+<summary><strong>Response</strong></summary>
+
 ```js
 {
     "modified": 1572893178,
@@ -100,6 +112,7 @@ Content-Length: 189
     ]
 }
 ```
+</details>
 
 ##### PUT /terms
 Replace all terms in dictionary and return updated dictionary
@@ -117,6 +130,9 @@ Content-Type: application/json;
 }
 ```
 
+<details>
+<summary><strong>Response</strong></summary>
+
 ```js
 {
     "modified": 1572893446,
@@ -126,7 +142,8 @@ Content-Type: application/json;
     ]
 }
 ``` 
-
+</details>
+    
 #### Links
 
 [Serverless Framework example for Golang and Lambda](https://serverless.com/blog/framework-example-golang-lambda-support/)
