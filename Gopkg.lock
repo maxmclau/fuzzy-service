@@ -16,7 +16,7 @@
   version = "v1.13.2"
 
 [[projects]]
-  digest = "1:ba4936fc339171a9197a4449bdba4cad69453d2a9c3e7d1789cee08f00085a50"
+  digest = "1:48f859e020691deec646dc95ba743b72bb72a0ec020200d49160dbaebf8449cd"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -62,8 +62,8 @@
     "service/sts/stsiface",
   ]
   pruneopts = ""
-  revision = "3550bcc6d4824489d3463ba8642bad0c1f4e3755"
-  version = "v1.25.25"
+  revision = "0cdb9f5617b12782c925df2fc10c00765ae0f4a4"
+  version = "v1.25.26"
 
 [[projects]]
   digest = "1:13fe471d0ed891e8544eddfeeb0471fd3c9f2015609a1c000aefdedf52a19d40"
@@ -71,14 +71,6 @@
   packages = ["."]
   pruneopts = ""
   revision = "c2b33e84"
-
-[[projects]]
-  digest = "1:2f32bddf0b568d3be2a418b176df4b8c3c092c1b24335c39f71f17591cdf217a"
-  name = "github.com/lithammer/fuzzysearch"
-  packages = ["fuzzy"]
-  pruneopts = ""
-  revision = "9704abcb5729ef17e4316e31439d7fcece8dac5f"
-  version = "v1.0.2"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -91,7 +83,6 @@
     "github.com/aws/aws-sdk-go/service/s3",
     "github.com/aws/aws-sdk-go/service/s3/s3manager",
     "github.com/aws/aws-sdk-go/service/ssm",
-    "github.com/lithammer/fuzzysearch/fuzzy",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
