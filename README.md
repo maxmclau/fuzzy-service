@@ -25,6 +25,106 @@ $ make build
 $ make deploy
 ```
 
+#### API
+Detailed request and response information for API
+
+
+##### GET /match
+Return all matched terms against dictionary
+
+```http
+GET /dev/match?q=Ammo&amp; q=I sell ammunition HTTP/1.1
+```
+
+```js
+[
+    {
+        "query": "Ammo",
+        "terms": [
+            "Ammo",
+            "Ammunition"
+        ]
+    }
+]
+``` 
+
+##### GET /terms
+Return all terms used in fuzzy matching along with the date they were last modified
+
+```http
+GET /prod/terms HTTP/1.1
+```
+
+```js
+{
+    "modified": 1572891670,
+    "terms": [
+        "420",
+        "Adult",
+        "Airline",
+        "Ammo"
+        ...
+    ]
+}
+``` 
+
+##### POST /terms
+Add additional terms to terms dictionary and return updated dictionary
+
+```http
+POST /prod/terms HTTP/1.1
+Content-Type: application/json;
+Content-Length: 189
+
+{
+    "terms": [
+        "Coffee",
+        "Theft"
+    ]
+}
+```
+
+```js
+{
+    "modified": 1572893178,
+    "terms": [
+        "420",
+        "Adult",
+        "Airline",
+        "Ammo",
+        ...
+        "Coffee",
+        "Theft"
+    ]
+}
+```
+
+##### PUT /terms
+Replace all terms in dictionary and return updated dictionary
+Content-Length: 167
+
+```http
+POST /prod/terms HTTP/1.1
+Content-Type: application/json;
+
+{
+    "terms": [
+        "Island",
+        "Epstein"
+    ]
+}
+```
+
+```js
+{
+    "modified": 1572893446,
+    "terms": [
+        "Island",
+        "Epstein"
+    ]
+}
+``` 
+
 #### Links
 
 [Serverless Framework example for Golang and Lambda](https://serverless.com/blog/framework-example-golang-lambda-support/)
