@@ -84,7 +84,7 @@ Add additional terms to terms dictionary and return updated dictionary
 
 ```http
 POST /prod/terms HTTP/1.1
-Content-Type: application/json;
+Content-Type: application/json
 Content-Length: 189
 
 {
@@ -116,11 +116,11 @@ Content-Length: 189
 
 ##### PUT /terms
 Replace all terms in dictionary and return updated dictionary
-Content-Length: 167
 
 ```http
 POST /prod/terms HTTP/1.1
-Content-Type: application/json;
+Content-Type: application/json
+Content-Length: 167
 
 {
     "terms": [
