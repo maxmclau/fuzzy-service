@@ -3,7 +3,7 @@
 
 Lambda based fuzzy matching function with mutable terms dictionary
 
-#### Installation
+### Installation
 Deployment and development of the function requires [serverless](https://github.com/serverless/serverless) & [dep](https://github.com/golang/dep).
 
 ```bash
@@ -17,26 +17,28 @@ $ brew install dep
 $ brew upgrade dep
 ```
 
-#### Build
+### Build
 ```bash
 $ make build
 ```
 
-#### Deploy
+### Deploy
 ```bash
 $ make deploy
 ```
 
-#### API
+### API
 Detailed request and response information for API
 
 
-##### GET /match
+#### GET /match
 Return all matched terms against dictionary
-
 ```http
 GET /prod/match?q=Ammo&amp; q=I sell ammunition HTTP/1.1
 ```
+
+<details>
+<summary><strong>Response</strong></summary>
 
 ```js
 [
@@ -49,13 +51,19 @@ GET /prod/match?q=Ammo&amp; q=I sell ammunition HTTP/1.1
     }
 ]
 ``` 
+</details>
 
-##### GET /terms
+
+
+#### GET /terms
 Return all terms used in fuzzy matching along with the date they were last modified
 
 ```http
 GET /prod/terms HTTP/1.1
 ```
+
+<details>
+<summary><strong>Response</strong></summary>
 
 ```js
 {
@@ -68,14 +76,15 @@ GET /prod/terms HTTP/1.1
         ...
     ]
 }
-``` 
+```
+</details>
 
-##### POST /terms
+#### POST /terms
 Add additional terms to terms dictionary and return updated dictionary
 
 ```http
 POST /prod/terms HTTP/1.1
-Content-Type: application/json;
+Content-Type: application/json
 Content-Length: 189
 
 {
@@ -85,6 +94,9 @@ Content-Length: 189
     ]
 }
 ```
+
+<details>
+<summary><strong>Response</strong></summary>
 
 ```js
 {
@@ -100,14 +112,15 @@ Content-Length: 189
     ]
 }
 ```
+</details>
 
-##### PUT /terms
+#### PUT /terms
 Replace all terms in dictionary and return updated dictionary
-Content-Length: 167
 
 ```http
 POST /prod/terms HTTP/1.1
-Content-Type: application/json;
+Content-Type: application/json
+Content-Length: 167
 
 {
     "terms": [
@@ -116,6 +129,9 @@ Content-Type: application/json;
     ]
 }
 ```
+
+<details>
+<summary><strong>Response</strong></summary>
 
 ```js
 {
@@ -126,8 +142,9 @@ Content-Type: application/json;
     ]
 }
 ``` 
-
-#### Links
+</details>
+    
+### Links
 
 [Serverless Framework example for Golang and Lambda](https://serverless.com/blog/framework-example-golang-lambda-support/)
 
