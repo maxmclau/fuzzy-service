@@ -1,4 +1,6 @@
 ## λ Fuzzy Service
+[![Built for SumUp](https://img.shields.io/badge/Built%20for%20SumUp-blue?style=flat)](http://sumup.com/)
+
 Lambda based fuzzy matching function with mutable terms dictionary
 
 #### Installation
