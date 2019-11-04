@@ -1,3 +1,6 @@
+include test.env
+export 
+
 .PHONY: build clean deploy
 
 build:
@@ -10,3 +13,6 @@ clean:
 
 deploy: clean build
 	sls deploy --verbose
+
+test: 
+	export AWSREGION=${AWSREGION} && export AWSBUCKET=${AWSBUCKET} && go test ./... --cover
