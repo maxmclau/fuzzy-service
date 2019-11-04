@@ -11,7 +11,7 @@ func ClientError(status int) (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{
 		StatusCode: status,
 		Body:       http.StatusText(status),
-	}, nil
+	}, fmt.Errorf("ClientError: %s", http.StatusText(status))
 }
 
 func ServerError(err error) (events.APIGatewayProxyResponse, error) {
@@ -20,5 +20,5 @@ func ServerError(err error) (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusInternalServerError,
 		Body:       http.StatusText(http.StatusInternalServerError),
-	}, nil
+	}, fmt.Errorf("ServerError: %s", err)
 }
