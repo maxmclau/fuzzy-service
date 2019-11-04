@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/maxmclau/fuzzy-service/lib/dictionary"
-
-	"github.com/lithammer/fuzzysearch/fuzzy"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -40,16 +39,19 @@ func Get(sess *session.Session, req events.APIGatewayProxyRequest) (events.APIGa
 	var matches []Match
 
 	for _, query := range queries {
-		terms := fuzzy.FindFold(query, dict.Terms)
+		q := strings.ToUpper(query)
 
-		if len(terms) != 0 {
-			var match Match
+		var match Match
 
-			match.Query = query
-			match.Terms = terms
-
-			matches = append(matches, match)
+		for _, term := range dict.Terms {
+			if strings.Contains(q, strings.ToUpper(term)) {
+				match.Terms = append(match.Terms, term)
+			}
 		}
+
+		match.Query = query
+
+		matches = append(matches, match)
 	}
 
 	resp, err := json.Marshal(matches)
