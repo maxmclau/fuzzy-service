@@ -33,7 +33,7 @@ Detailed request and response information for API
 Return all matched terms against dictionary
 
 ```http
-GET /dev/match?q=Ammo&amp; q=I sell ammunition HTTP/1.1
+GET /prod/match?q=Ammo&amp; q=I sell ammunition HTTP/1.1
 ```
 
 ```js
