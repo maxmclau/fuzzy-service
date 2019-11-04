@@ -1,11 +1,28 @@
-service: fuzzy-service
+service: fuzzy
 frameworkVersion: '>=1.28.0 <2.0.0'
+
+custom:
+  bucket-store: 'fuzzy-bucket'
 
 provider:
   name: aws
   runtime: go1.x
   region: us-west-1
+  environment:
+    AWS_BUCKET: ${self:custom.bucket-store}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:GetObject
+        - s3:PutObject
+      Resource: "arn:aws:s3:::${self:custom.bucket-store}/*"
 
+resources:
+  Resources:
+    S3BucketConfiguration:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucket-store}
 
 package:
   exclude:
@@ -14,11 +31,11 @@ package:
     - ./bin/**
 
 functions:
-  dictionary:
-    handler: bin/dictionary
+  terms:
+    handler: bin/terms
     events:
       - http:
-          path: dictionary
+          path: terms
           method: get
           # authorizer: # An AWS API Gateway custom authorizer function
             # name: authorizerFunc # The name of the authorizer function (must be in this service)
@@ -28,8 +45,14 @@ functions:
             # identityValidationExpression: someRegex
             # type: token #
       - http:
-          path: dictionary
+          path: terms
           method: post
       - http:
-          path: dictionary
+          path: terms
           method: put
+  match:
+    handler: bin/match
+    events:
+      - http:
+          path: match
+          method: get
