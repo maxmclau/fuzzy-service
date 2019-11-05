@@ -51,7 +51,9 @@ func Get(sess *session.Session, req events.APIGatewayProxyRequest) (events.APIGa
 
 		match.Query = query
 
-		matches = append(matches, match)
+		if len(match.Terms) > 0 {
+			matches = append(matches, match)
+		}
 	}
 
 	resp, err := json.Marshal(matches)
