@@ -1,0 +1,14 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Terms Post",
+  "required": ["terms"],
+  "properties": {
+    "terms": {
+      "type": "array",
+      "title": "Additional Terms Array",
+      "pattern": "^[a-zA-Z0-9]+$"
+    }
+  }
+}

@@ -47,12 +47,22 @@ functions:
       - http:
           path: terms
           method: post
+          request:
+            schema:
+              application/json: ${file(schemas/terms_post.json)}
       - http:
           path: terms
           method: put
+          request:
+            schema:
+              application/json: ${file(schemas/terms_put.json)}
   match:
     handler: bin/match
     events:
       - http:
           path: match
           method: get
+          request:
+            parameters:
+              querystrings:
+                q: true
