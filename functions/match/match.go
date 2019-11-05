@@ -69,7 +69,6 @@ func Get(sess *session.Session, req events.APIGatewayProxyRequest) (events.APIGa
 	} else {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusNoContent,
-			Body:       string(http.StatusNoContent),
 		}, nil
 	}
 }
