@@ -73,7 +73,7 @@ GET /prod/terms HTTP/1.1
 ```
 
 <details>
-<summary><strong>204 No Content</strong> - Response</summary>
+<summary><strong>200 OK</strong> - Response</summary>
 
 ```js
 {
@@ -106,7 +106,7 @@ Content-Length: 189
 ```
 
 <details>
-<summary><strong>204 No Content</strong> - Response</summary>
+<summary><strong>200 OK</strong> - Response</summary>
 
 ```js
 {
@@ -141,7 +141,7 @@ Content-Length: 167
 ```
 
 <details>
-<summary><strong>204 No Content</strong> - Response</summary>
+<summary><strong>200 OK</strong> - Response</summary>
 
 ```js
 {
