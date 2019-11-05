@@ -14,7 +14,6 @@ On Mac, installing **dep** would look something like this.
 
 ```bash
 $ brew install dep
-$ brew upgrade dep
 ```
 
 ### Build
@@ -25,6 +24,7 @@ $ make build
 ### Deploy
 ```bash
 $ make deploy
+$ make deploy-prod
 ```
 
 ### API
