@@ -10,3 +10,6 @@ clean:
 
 deploy: clean build
 	sls deploy --verbose
+
+deploy-prod: clean build
+	sls deploy -s prod --verbose
