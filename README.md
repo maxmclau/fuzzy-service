@@ -38,7 +38,7 @@ GET /prod/match?q=Ammo&amp; q=I sell ammunition HTTP/1.1
 ```
 
 <details>
-<summary><strong>Response</strong></summary>
+<summary><strong>200 OK</strong> - Response</summary>
 
 ```js
 [
@@ -53,7 +53,17 @@ GET /prod/match?q=Ammo&amp; q=I sell ammunition HTTP/1.1
 ``` 
 </details>
 
+```http
+GET /prod/match?q=Puppies&amp; q=I sell puppies HTTP/1.1
+```
 
+<details>
+<summary><strong>204 No Content</strong> - Response</summary>
+
+```js
+...
+``` 
+</details>
 
 #### GET /terms
 Return all terms used in fuzzy matching along with the date they were last modified
@@ -63,7 +73,7 @@ GET /prod/terms HTTP/1.1
 ```
 
 <details>
-<summary><strong>Response</strong></summary>
+<summary><strong>204 No Content</strong> - Response</summary>
 
 ```js
 {
@@ -96,7 +106,7 @@ Content-Length: 189
 ```
 
 <details>
-<summary><strong>Response</strong></summary>
+<summary><strong>204 No Content</strong> - Response</summary>
 
 ```js
 {
@@ -131,7 +141,7 @@ Content-Length: 167
 ```
 
 <details>
-<summary><strong>Response</strong></summary>
+<summary><strong>204 No Content</strong> - Response</summary>
 
 ```js
 {
