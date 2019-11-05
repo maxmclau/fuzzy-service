@@ -56,15 +56,22 @@ func Get(sess *session.Session, req events.APIGatewayProxyRequest) (events.APIGa
 		}
 	}
 
-	resp, err := json.Marshal(matches)
-	if err != nil {
-		return utils.ServerError(err)
-	}
+	if len(matches) > 0 {
+		resp, err := json.Marshal(matches)
+		if err != nil {
+			return utils.ServerError(err)
+		}
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: http.StatusOK,
-		Body:       string(resp),
-	}, nil
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusOK,
+			Body:       string(resp),
+		}, nil
+	} else {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusNoContent,
+			Body:       string(http.StatusNoContent),
+		}, nil
+	}
 }
 
 func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
