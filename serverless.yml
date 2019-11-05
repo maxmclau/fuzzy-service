@@ -2,14 +2,20 @@ service: fuzzy
 frameworkVersion: '>=1.28.0 <2.0.0'
 
 custom:
-  bucket-store: 'fuzzy-bucket'
+  bucket-store-opts: 
+    dev: 'fuzzy-bucket-dev'
+    prod: 'fuzzy-bucket-prod'
+  bucket-store: ${self:custom.bucket-store-opts.${opt:stage, self:provider.stage}}
+  stage: ${opt:stage, self:provider.stage}
+
 
 provider:
   name: aws
+  stage: dev
   runtime: go1.x
   region: us-west-1
   environment:
-    AWS_BUCKET: ${self:custom.bucket-store}
+    AWSBUCKET: ${self:custom.bucket-store}
   iamRoleStatements:
     - Effect: Allow
       Action:

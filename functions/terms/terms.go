@@ -15,13 +15,13 @@ import (
 )
 
 var (
-	AWS_BUCKET = os.Getenv("AWS_BUCKET")
+	AWSBUCKET = os.Getenv("AWSBUCKET")
 )
 
 func Get(sess *session.Session) (events.APIGatewayProxyResponse, error) {
 	var dict dictionary.Dictionary
 
-	err := dictionary.GetDictionary(sess, &dict, AWS_BUCKET, false)
+	err := dictionary.GetDictionary(sess, &dict, AWSBUCKET, false)
 	if err != nil {
 		return utils.ServerError(err)
 	}
@@ -54,7 +54,7 @@ func PostPut(sess *session.Session, req events.APIGatewayProxyRequest) (events.A
 
 	if req.HTTPMethod == http.MethodPost {
 		var currentDict dictionary.Dictionary
-		err = dictionary.GetDictionary(sess, &currentDict, AWS_BUCKET, false)
+		err = dictionary.GetDictionary(sess, &currentDict, AWSBUCKET, false)
 		if err != nil {
 			return utils.ServerError(err)
 		}
@@ -64,7 +64,7 @@ func PostPut(sess *session.Session, req events.APIGatewayProxyRequest) (events.A
 
 	requestDict.Modified = time.Now().Unix()
 
-	resp, err := dictionary.SetDictionary(sess, &requestDict, AWS_BUCKET)
+	resp, err := dictionary.SetDictionary(sess, &requestDict, AWSBUCKET)
 	if err != nil {
 		return utils.ServerError(err)
 	}

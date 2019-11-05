@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	AWS_BUCKET = os.Getenv("AWS_BUCKET")
+	AWSBUCKET = os.Getenv("AWSBUCKET")
 )
 
 type Match struct {
@@ -31,7 +31,7 @@ func Get(sess *session.Session, req events.APIGatewayProxyRequest) (events.APIGa
 
 	var dict dictionary.Dictionary
 
-	err := dictionary.GetDictionary(sess, &dict, AWS_BUCKET, false)
+	err := dictionary.GetDictionary(sess, &dict, AWSBUCKET, false)
 	if err != nil {
 		return utils.ServerError(err)
 	}
